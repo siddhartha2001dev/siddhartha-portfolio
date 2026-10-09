@@ -6,6 +6,7 @@ const WIDTH = 720
 const HEIGHT = 420
 const BIRD_X = 150
 const GAP = 132
+const BEST_SCORE_KEY = 'signal-flyer-best-score'
 
 const newPipe = (x) => ({ x, gapY: 90 + Math.random() * 180, passed: false })
 
@@ -15,6 +16,10 @@ export default function Game({ standalone = false }) {
   const game = useRef({ playing: false, last: 0, birdY: HEIGHT / 2, velocity: 0, pipes: [newPipe(620)], score: 0 })
   const [playing, setPlaying] = useState(false)
   const [score, setScore] = useState(0)
+  const [bestScore, setBestScore] = useState(() => {
+    const stored = Number(window.localStorage?.getItem(BEST_SCORE_KEY) || 0)
+    return Number.isFinite(stored) ? stored : 0
+  })
   const [result, setResult] = useState('ready')
 
   const start = () => {
@@ -49,7 +54,16 @@ export default function Game({ standalone = false }) {
         if (state.pipes[state.pipes.length - 1].x < WIDTH - 260) state.pipes.push(newPipe(WIDTH + 40))
         state.pipes = state.pipes.filter((pipe) => pipe.x > -90)
         state.pipes.forEach((pipe) => {
-          if (!pipe.passed && pipe.x + 64 < BIRD_X) { pipe.passed = true; state.score += 1; setScore(state.score) }
+          if (!pipe.passed && pipe.x + 64 < BIRD_X) {
+            pipe.passed = true
+            state.score += 1
+            setScore(state.score)
+            setBestScore((currentBest) => {
+              if (state.score <= currentBest) return currentBest
+              window.localStorage?.setItem(BEST_SCORE_KEY, String(state.score))
+              return state.score
+            })
+          }
         })
         const birdTop = state.birdY - 12; const birdBottom = state.birdY + 12
         const hitEdge = birdTop < 18 || birdBottom > HEIGHT - 18
@@ -91,7 +105,7 @@ export default function Game({ standalone = false }) {
       <div className="mx-auto max-w-[1100px]">
         <div className="flex items-end justify-between gap-6"><SectionLabel index={standalone ? 2 : 6} title="Signal Flyer" meta="Interactive" /><span className="hidden font-mono text-[10px] uppercase tracking-[0.2em] text-muted md:block">Space / tap to flap</span></div>
         <div className="mt-8 grid gap-8 md:grid-cols-12 md:items-end">
-          <div className="md:col-span-5"><h2 className="font-display text-[clamp(3.5rem,10vw,9rem)] font-black uppercase leading-[0.78] tracking-[-0.07em] wdth-cond">FLY<br /><span className="text-accent">HIGH.</span></h2><p className="mt-7 max-w-[34ch] font-serif text-2xl italic leading-tight text-muted md:text-3xl">Thread the signal gates without touching the grid. One tap changes your trajectory.</p><div className="mt-8 flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.18em]"><span className="border border-white/20 px-3 py-2">Score {String(score).padStart(2, '0')}</span><span className="border border-white/20 px-3 py-2">Best run</span></div></div>
+          <div className="md:col-span-5"><h2 className="font-display text-[clamp(3.5rem,10vw,9rem)] font-black uppercase leading-[0.78] tracking-[-0.07em] wdth-cond">FLY<br /><span className="text-accent">HIGH.</span></h2><p className="mt-7 max-w-[34ch] font-serif text-2xl italic leading-tight text-muted md:text-3xl">Thread the signal gates without touching the grid. One tap changes your trajectory.</p><div className="mt-8 border border-white/20 bg-white/[0.03] p-4 font-mono text-[10px] uppercase tracking-[0.18em]"><div className="mb-4 flex items-center justify-between border-b border-white/10 pb-3 text-accent"><span>Scoreboard</span><span>Live // 01</span></div><div className="grid grid-cols-2 gap-3"><div><span className="block text-muted">Current</span><strong className="mt-1 block text-2xl text-paper">{String(score).padStart(2, '0')}</strong></div><div><span className="block text-muted">Best run</span><strong className="mt-1 block text-2xl text-paper">{String(bestScore).padStart(2, '0')}</strong></div></div><div className="mt-4 flex items-center justify-between border-t border-white/10 pt-3 text-muted"><span>Status</span><span className="text-paper">{result === 'playing' ? 'Active' : result === 'lost' ? 'Signal lost' : 'Ready'}</span></div></div></div>
           <div className="md:col-span-7"><div className="relative overflow-hidden border border-white/20 bg-[#080711] p-2 shadow-[0_0_80px_rgba(255,112,67,0.08)]"><canvas ref={canvas} width={WIDTH} height={HEIGHT} onPointerDown={flap} className="block h-auto w-full cursor-pointer" aria-label="Signal Flyer game board. Tap or press Space to fly." /><div className="pointer-events-none absolute left-6 top-5 font-mono text-[9px] uppercase tracking-[0.18em] text-muted">SB // FLIGHT_01</div><div className="pointer-events-none absolute bottom-5 right-6 font-mono text-[9px] uppercase tracking-[0.18em] text-accent">{result === 'playing' ? 'FLIGHT ACTIVE' : result === 'lost' ? 'SIGNAL LOST' : 'TAP TO LAUNCH'}</div></div><button type="button" data-cursor="link" onClick={start} className="mt-4 border border-accent bg-accent px-5 py-3 font-mono text-[10px] uppercase tracking-[0.2em] text-ink transition-transform duration-300 hover:-translate-y-1">{playing ? 'Restart' : result === 'ready' ? 'Start game' : 'Play again'}</button></div>
         </div>
         <p className="mt-8 font-mono text-[10px] uppercase tracking-[0.16em] text-muted">Built for {siteConfig.fullName} / experimental interface layer</p>

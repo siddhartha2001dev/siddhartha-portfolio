@@ -7,16 +7,26 @@ import { setLenis } from '../animations/lenisStore'
 export function useLenis(reduced) {
   useEffect(() => {
     const lenis = new Lenis({
-      duration: reduced ? 0.01 : 1.1,
+      // Drive Lenis from GSAP's ticker so scroll and ScrollTrigger stay on
+      // the same frame. Lerp gives a more consistent feel than a fixed
+      // duration when the wheel velocity changes.
+      autoRaf: false,
+      // A lower lerp produces a longer, softer glide instead of a sharp
+      // catch-up when the wheel emits larger deltas.
+      lerp: reduced ? 1 : 0.055,
       smoothWheel: !reduced,
-      wheelMultiplier: 0.95,
-      touchMultiplier: 1.4,
+      wheelMultiplier: reduced ? 1 : 0.78,
+      touchMultiplier: reduced ? 1 : 1.05,
+      syncTouch: false,
+      overscroll: true,
     })
     setLenis(lenis)
     lenis.on('scroll', ScrollTrigger.update)
     const tick = (t) => lenis.raf(t * 1000)
     gsap.ticker.add(tick)
-    gsap.ticker.lagSmoothing(0)
+    // Keep animation frames from jumping after a brief tab switch or
+    // rendering hiccup while still allowing GSAP to recover normally.
+    gsap.ticker.lagSmoothing(500, 33)
     lenis.stop() // released by the loader
     return () => {
       gsap.ticker.remove(tick)

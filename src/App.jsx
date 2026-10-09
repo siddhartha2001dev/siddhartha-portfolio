@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { ScrollTrigger } from './animations/gsapSetup'
 import { getLenis } from './animations/lenisStore'
 import { useLenis } from './hooks/useLenis'
@@ -18,18 +19,33 @@ import Skills from './sections/Skills'
 import Contact from './sections/Contact'
 import Game from './sections/Game'
 
-export default function App() {
+function HomePage({ ready }) {
+  return (
+    <>
+      <Hero ready={ready} />
+      <TechStackBanner />
+      <About />
+      <SelectedWork />
+      <Experience />
+      <Skills />
+      <Contact />
+    </>
+  )
+}
+
+function AppShell() {
   const reduced = useReducedMotion()
   const [ready, setReady] = useState(false)
   const [loaderGone, setLoaderGone] = useState(false)
-  const [route, setRoute] = useState(() => window.location.pathname.replace(/\/+$/, '') || '/')
+  const location = useLocation()
   useLenis(reduced)
 
+  // Route changes stay in the same document, so reset the scroll position and
+  // let ScrollTrigger measure the newly mounted page sections.
   useEffect(() => {
-    const onPopState = () => setRoute(window.location.pathname.replace(/\/+$/, '') || '/')
-    window.addEventListener('popstate', onPopState)
-    return () => window.removeEventListener('popstate', onPopState)
-  }, [])
+    getLenis()?.scrollTo(0, { immediate: true })
+    requestAnimationFrame(() => ScrollTrigger.refresh())
+  }, [location.pathname])
 
   const reveal = useCallback(() => {
     getLenis()?.start()
@@ -50,8 +66,6 @@ export default function App() {
     return () => window.removeEventListener('load', onLoad)
   }, [])
 
-  const isHome = route === '/'
-
   return (
     <>
       <a
@@ -67,23 +81,24 @@ export default function App() {
       <GridLines />
       <Navigation visible={ready} />
       <main>
-        {isHome && (
-          <>
-            <Hero ready={ready} />
-            <TechStackBanner />
-            <About />
-            <SelectedWork />
-            <Experience />
-            <Skills />
-            <Contact />
-          </>
-        )}
-        {route === '/projects' && <SelectedWork standalone />}
-        {route === '/about' && <About standalone />}
-        {route === '/experience' && <Experience />}
-        {route === '/contact' && <Contact />}
-        {route === '/game' && <Game standalone />}
+        <Routes>
+          <Route path="/" element={<HomePage ready={ready} />} />
+          <Route path="/projects" element={<SelectedWork standalone />} />
+          <Route path="/about" element={<About standalone />} />
+          <Route path="/experience" element={<Experience />} />
+          <Route path="/contact" element={<Contact standalone />} />
+          <Route path="/game" element={<Game standalone />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </main>
     </>
+  )
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppShell />
+    </BrowserRouter>
   )
 }

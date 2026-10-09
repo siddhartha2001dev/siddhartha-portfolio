@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { gsap } from '../../animations/gsapSetup'
 import siteConfig from '../../data/siteConfig'
 
@@ -14,7 +15,8 @@ export default function Navigation({ visible }) {
   const [open, setOpen] = useState(false)
   const [onLight, setOnLight] = useState(false)
   const [nightMode, setNightMode] = useState(() => window.localStorage?.getItem('portfolio-theme') === 'night')
-  const currentPath = window.location.pathname.replace(/\/+$/, '') || '/'
+  const { pathname } = useLocation()
+  const currentPath = pathname.replace(/\/+$/, '') || '/'
   const header = useRef(null)
   const overlay = useRef(null)
 
@@ -73,6 +75,10 @@ export default function Navigation({ visible }) {
     return () => window.removeEventListener('keydown', key)
   }, [open])
 
+  useEffect(() => {
+    setOpen(false)
+  }, [currentPath])
+
   return (
     <>
       <header
@@ -82,19 +88,19 @@ export default function Navigation({ visible }) {
         }`}
       >
         <nav aria-label="Primary" className="bg-transparent flex items-center justify-between px-5 py-5 md:px-8">
-          <a
-            href="/"
+          <Link
+            to="/"
             data-cursor="link"
             className="site-nav__brand font-display text-sm font-extrabold uppercase tracking-[0.18em]"
           >
             {siteConfig.name}<span className="text-accent">.</span>
-          </a>
+          </Link>
 
           <ul className="hidden items-center gap-9 md:flex">
             {LINKS.map((l) => (
               <li key={l.href}>
-                <a
-                  href={l.href}
+                <Link
+                  to={l.href}
                   data-cursor="link"
                   aria-current={currentPath === l.href ? 'true' : undefined}
                   className="group relative font-mono text-[11px] uppercase tracking-[0.2em]"
@@ -105,7 +111,7 @@ export default function Navigation({ visible }) {
                       currentPath === l.href ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
                     }`}
                   />
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -162,15 +168,16 @@ export default function Navigation({ visible }) {
         <ul className="mb-10 space-y-1">
           {LINKS.map((l, i) => (
             <li key={l.href} className="mask-line">
-              <a
+              <Link
                 data-item
-                href={l.href}
+                to={l.href}
                 tabIndex={open ? 0 : -1}
+                onClick={() => setOpen(false)}
                 className="flex items-baseline gap-4 font-display text-[16vw] font-black uppercase leading-[0.95] tracking-[-0.04em] wdth-cond"
               >
                 <span className="font-mono text-xs tracking-[0.2em]">{String(i + 1).padStart(2, '0')}</span>
                 {l.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
