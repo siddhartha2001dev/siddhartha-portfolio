@@ -1136,8 +1136,7 @@ html:not([data-theme-mode='night']) #ai-lab .ai-lab-card__noise {
     perspective: none;
     overscroll-behavior-inline: contain;
     scroll-snap-type: x mandatory;
-    scrollbar-color: var(--color-accent) rgba(255, 255, 255, 0.12);
-    scrollbar-width: thin;
+    scrollbar-width: none;
     scroll-padding-inline: calc((100vw - min(84vw, 30rem)) / 2);
   }
 
@@ -1153,6 +1152,10 @@ html:not([data-theme-mode='night']) #ai-lab .ai-lab-card__noise {
     scroll-snap-align: center;
     will-change: transform, opacity;
     transition: border-color 0.55s var(--ease-expo), background 0.55s ease, opacity 0.2s ease;
+  }
+
+  .ai-lab__rail::-webkit-scrollbar {
+    display: none;
   }
 }
 
