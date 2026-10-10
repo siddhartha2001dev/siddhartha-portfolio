@@ -154,7 +154,6 @@ export default function AiLab() {
     const track = rail.current
     if (!track) return undefined
     const cards = [...track.querySelectorAll('[data-lab-card]')]
-    const mobile = window.matchMedia('(max-width: 767px)').matches
     const getTravel = () => Math.max(1, track.clientHeight + 32)
     const updateCards = (progress = scrollProgress.current) => {
       scrollProgress.current = progress
@@ -183,16 +182,13 @@ export default function AiLab() {
       // Resolve the start against the actual viewport center so the fixed
       // navbar never participates in the card-stack trigger calculation.
       start: () => `center ${Math.round(window.innerHeight / 2 + 32)}px`,
-      // The mobile cards travel by the full rail height. Match the trigger's
-      // distance to that movement so the final card reaches the front and
-      // reversing the gesture follows the exact same path.
-      end: () => `+=${mobile
-        ? Math.max(1200, (cards.length - 1) * getTravel())
-        : Math.max(1200, cards.length * 360)}`,
+      // Keep the same scroll range on every device so the stack has the same
+      // timing and card-to-card rhythm as the desktop animation.
+      end: () => `+=${Math.max(1200, cards.length * 360)}`,
       pin: true,
-      // Touch scrolling needs a direct reversible mapping; the desktop scrub
-      // lag makes the stack appear to skip or stall when scrolling upward.
-      scrub: mobile ? true : 1,
+      // Use the same scrub behavior on touch and desktop so the stack follows
+      // the same movement curve in both directions.
+      scrub: 1,
       invalidateOnRefresh: true,
       onRefresh: (self) => updateCards(self.progress),
       onUpdate: (self) => {
