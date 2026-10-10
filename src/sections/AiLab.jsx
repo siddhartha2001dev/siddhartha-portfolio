@@ -4,7 +4,6 @@ import { RoundedBox } from '@react-three/drei'
 import * as THREE from 'three'
 import { gsap, ScrollTrigger } from '../animations/gsapSetup'
 import { sceneState } from '../animations/sceneState'
-import { useScrollAnimation } from '../hooks/useScrollAnimation'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import SectionLabel from '../components/common/SectionLabel'
 import FillText from '../components/common/FillText'
@@ -137,27 +136,15 @@ export default function AiLab() {
   const scrollProgress = useRef(0)
   const reduced = useReducedMotion()
 
-  useScrollAnimation(root, (_, el) => {
-    const cards = el.querySelectorAll('[data-lab-card]')
-    gsap.from(cards, {
-      opacity: 0,
-      y: 45,
-      rotate: (index) => (index % 2 ? 1.5 : -1.5),
-      stagger: 0.12,
-      duration: 1.1,
-      ease: 'power3.out',
-      scrollTrigger: { trigger: el, start: 'top 72%' },
-    })
-  })
-
   useEffect(() => {
     const track = rail.current
     if (!track) return undefined
     const cards = [...track.querySelectorAll('[data-lab-card]')]
-    const mobile = window.matchMedia('(max-width: 767px)').matches
-    // Mobile uses a simple in-flow card list. The desktop stack is kept
-    // intact, but pinned transforms make touch scrolling unnecessarily hard.
-    if (mobile) {
+    const stackViewport = window.matchMedia('(min-width: 1200px)').matches
+    // Only wide desktop uses the pinned stack. Mobile and tablet/iPad use the
+    // same in-flow horizontal rail, which keeps the heading and cards in one
+    // responsive layout instead of pinning cards over the intro copy.
+    if (!stackViewport) {
       let frame = 0
       const updateMobileCards = () => {
         frame = 0
@@ -224,7 +211,7 @@ export default function AiLab() {
       pin: true,
       // A boolean scrub removes the one-second tween that can leave a card
       // frozen on its forward position after a quick mobile direction change.
-      scrub: mobile ? true : 1,
+      scrub: 1,
       invalidateOnRefresh: true,
       onRefresh: (self) => updateCards(self.progress),
       onUpdate: (self) => {

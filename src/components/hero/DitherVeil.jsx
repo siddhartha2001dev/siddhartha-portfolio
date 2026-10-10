@@ -786,11 +786,21 @@ const DitherVeil = ({
       wake();
     };
     const onDown = e => {
-      if (coarsePointer && e.pointerType !== 'mouse') return;
-      onMove(e);
-      if (!settingsRef.current?.clickBurst || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      // Pointer movement is intentionally ignored on touch devices so a
+      // swipe can still scroll the page. A deliberate tap, however, should
+      // still be able to trigger the same reveal burst as a mouse click.
+      if (e.pointerType === 'mouse') {
+        if (e.button !== 0) return;
+        onMove(e);
+      } else {
+        locate(e);
+        pointer.fresh = true;
+        wake();
+      }
+      if (!settingsRef.current?.clickBurst) return;
       bursts.push({ x: pointer.x, y: pointer.y, start: performance.now() });
       if (bursts.length > MAX_BURSTS) bursts.shift();
+      wake();
     };
 
     const onOrientation = event => {

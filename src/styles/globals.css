@@ -889,6 +889,7 @@ html[data-companion-collapse='true'] body::after {
   margin-inline: auto;
   perspective: 1200px;
   overflow: visible !important;
+  margin-top: clamp(4rem, 9vh, 8rem);
 }
 
 .ai-lab-card {
@@ -1119,7 +1120,7 @@ html:not([data-theme-mode='night']) #ai-lab .ai-lab-card__noise {
   86% { opacity: 0.22; transform: translateY(78%); }
 }
 
-@media (max-width: 767px) {
+@media (max-width: 1199px) {
   .ai-lab__rail {
     display: flex !important;
     flex-direction: row;
