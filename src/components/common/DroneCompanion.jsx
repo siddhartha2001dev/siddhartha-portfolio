@@ -48,7 +48,9 @@ function BeeRig({ progressRef, reduced, reacting }) {
     rig.current.rotation.x = THREE.MathUtils.damp(rig.current.rotation.x, sceneState.mouseY * -0.055 * motion - response * 0.18, 3, delta)
     rig.current.rotation.z = THREE.MathUtils.damp(rig.current.rotation.z, sceneState.mouseX * -0.03 * motion + Math.sin(time * 18) * response * 0.025, 3, delta)
     const scale = 1 + response * 0.055
-    rig.current.scale.set(scale, 1 - response * 0.035, scale)
+    // Keep the model uniformly scaled on touch devices and during the click
+    // reaction so the bee never appears stretched or squashed.
+    rig.current.scale.setScalar(scale)
   })
 
   return (
@@ -156,16 +158,16 @@ export default function DroneCompanion() {
         }}
       >
       <div className="drone-companion__scene">
-        <Canvas camera={{ position: [5, 2.4, 7.2], fov: 38 }} dpr={[1, mobile ? 1.2 : 1.75]} shadows={!mobile} gl={{ alpha: true, antialias: !mobile, powerPreference: 'high-performance', toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 0.95 }}>
+        <Canvas camera={{ position: [5, 2.4, 7.2], fov: 38 }} dpr={[1, mobile ? 1.8 : 1.75]} shadows gl={{ alpha: true, antialias: true, powerPreference: 'high-performance', toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 0.95 }}>
           <ambientLight intensity={0.5} />
-          <directionalLight position={[3, 4, 5]} intensity={3.1} color="#fff4df" castShadow={!mobile} shadow-mapSize={[512, 512]} />
+          <directionalLight position={[3, 4, 5]} intensity={3.1} color="#fff4df" castShadow shadow-mapSize={[mobile ? 768 : 1024, mobile ? 768 : 1024]} />
           <directionalLight position={[-4, 2, -3]} intensity={1.25} color="#b9d9ff" />
           <spotLight position={[1.5, 3.5, 4]} angle={0.48} penumbra={0.65} intensity={4.2} color="#fff8ed" castShadow />
           <pointLight position={[2, 1, 3]} intensity={3.2} color="#ff9d2e" distance={8} decay={2} />
           <pointLight position={[-2, 0.4, 1]} intensity={1.8} color="#5ab9ff" distance={7} decay={2} />
-          <Environment preset="city" environmentIntensity={mobile ? 0.58 : 0.72} />
+          <Environment preset="city" environmentIntensity={0.72} />
           <BeeRig progressRef={progressRef} reduced={reduced} reacting={reacting} />
-          {!mobile && <ContactShadows position={[0, -2.2, 0]} opacity={0.3} scale={5} blur={2.8} far={3.2} color="#14181c" />}
+          <ContactShadows position={[0, -2.2, 0]} opacity={mobile ? 0.22 : 0.3} scale={5} blur={mobile ? 2.2 : 2.8} far={3.2} color="#14181c" />
         </Canvas>
       </div>
       </div>
