@@ -1116,17 +1116,24 @@ html:not([data-theme-mode='night']) #ai-lab .ai-lab-card__noise {
 
 @media (max-width: 767px) {
   .ai-lab__rail {
-    height: min(42rem, calc(100svh - 9rem));
-    touch-action: pan-y;
+    display: flex !important;
+    flex-direction: column;
+    gap: 1rem;
+    height: auto;
+    width: 100%;
+    overflow: visible !important;
+    perspective: none;
   }
 
   .ai-lab-card {
-    min-height: 0;
-    /* Let the page gesture drive the pinned stack. The card contents fit in
-       the mobile rail; nested overflow would capture the same finger drag
-       and make the cards appear stuck. */
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    min-height: 32rem;
     overflow: hidden;
     touch-action: pan-y;
+    transform: none !important;
   }
 }
 

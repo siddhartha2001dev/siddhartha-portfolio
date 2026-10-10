@@ -155,6 +155,9 @@ export default function AiLab() {
     if (!track) return undefined
     const cards = [...track.querySelectorAll('[data-lab-card]')]
     const mobile = window.matchMedia('(max-width: 767px)').matches
+    // Mobile uses a simple in-flow card list. The desktop stack is kept
+    // intact, but pinned transforms make touch scrolling unnecessarily hard.
+    if (mobile) return undefined
     const getTravel = () => Math.max(1, track.clientHeight + 32)
     const updateCards = (progress = scrollProgress.current) => {
       scrollProgress.current = progress
