@@ -14,6 +14,50 @@
   will-change: transform;
 }
 
+.dither-veil--waiting {
+  opacity: 0;
+}
+
+.dither-veil--arrive {
+  animation: dither-face-glitch-in 0.72s steps(7, end) both;
+}
+
+@keyframes dither-face-glitch-in {
+  0% {
+    opacity: 0;
+    clip-path: inset(0 0 0 0);
+    transform: perspective(1100px) translate3d(var(--parallax-x, 0%), var(--parallax-y, 0%), 0) rotateX(var(--parallax-rotate-x, 0deg)) rotateY(var(--parallax-rotate-y, 0deg)) scale(1.035);
+    filter: contrast(1.5) saturate(1.5);
+  }
+  18% {
+    opacity: 0.82;
+    clip-path: inset(0 0 62% 0);
+    transform: perspective(1100px) translate3d(calc(var(--parallax-x, 0%) - 0.7%), var(--parallax-y, 0%), 0) rotateX(var(--parallax-rotate-x, 0deg)) rotateY(var(--parallax-rotate-y, 0deg)) scale(1.035);
+  }
+  36% {
+    opacity: 1;
+    clip-path: inset(48% 0 12% 0);
+    transform: perspective(1100px) translate3d(calc(var(--parallax-x, 0%) + 0.8%), var(--parallax-y, 0%), 0) rotateX(var(--parallax-rotate-x, 0deg)) rotateY(var(--parallax-rotate-y, 0deg)) scale(1.035);
+    filter: contrast(1.25) saturate(1.2);
+  }
+  54% {
+    opacity: 0.86;
+    clip-path: inset(16% 0 38% 0);
+    transform: perspective(1100px) translate3d(calc(var(--parallax-x, 0%) - 0.45%), var(--parallax-y, 0%), 0) rotateX(var(--parallax-rotate-x, 0deg)) rotateY(var(--parallax-rotate-y, 0deg)) scale(1.035);
+  }
+  76% {
+    opacity: 1;
+    clip-path: inset(0);
+    transform: perspective(1100px) translate3d(var(--parallax-x, 0%), var(--parallax-y, 0%), 0) rotateX(var(--parallax-rotate-x, 0deg)) rotateY(var(--parallax-rotate-y, 0deg)) scale(1.035);
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(0);
+    transform: perspective(1100px) translate3d(var(--parallax-x, 0%), var(--parallax-y, 0%), 0) rotateX(var(--parallax-rotate-x, 0deg)) rotateY(var(--parallax-rotate-y, 0deg)) scale(1.035);
+    filter: none;
+  }
+}
+
 .dither-veil canvas {
   display: block;
   width: 100%;
@@ -24,5 +68,11 @@
   .dither-veil {
     transform: none;
     transition: none;
+  }
+
+  .dither-veil--arrive {
+    animation: none;
+    opacity: 1;
+    clip-path: none;
   }
 }

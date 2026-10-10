@@ -90,7 +90,7 @@ export default function ProjectFrame({ project, index, total }) {
           >
             <div data-frame className="project-frame relative aspect-[4/5] w-full overflow-hidden bg-white/5 sm:aspect-[4/3]">
               <div data-hover-scale className="h-full w-full">
-                <div data-media className="h-full w-full will-change-transform">
+                <div data-media className="h-full w-full">
                   <ProjectMedia project={project} index={index} total={total} />
                 </div>
               </div>
@@ -126,7 +126,7 @@ export default function ProjectFrame({ project, index, total }) {
 
         <div
           data-title-wrap
-          className={`pointer-events-none relative z-20 md:absolute md:bottom-[-6vh] md:max-w-[70%] ${flip ? 'md:left-0' : 'md:right-0 md:text-right'}`}
+          className={`project-title--${project.id} pointer-events-none relative z-20 md:absolute md:bottom-[-6vh] md:max-w-[70%] ${flip ? 'md:left-0' : 'md:right-0 md:text-right'}`}
         >
           <h3
             id={`project-${project.id}`}

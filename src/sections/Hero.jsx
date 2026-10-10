@@ -15,6 +15,17 @@ const LINE_STYLES = [
   'self-start [font-size:min(17vw,17vh)]',
 ]
 
+const HERO_CODE = [
+  '0101 1100 0011 1010 0110 1001 0100 1110 0010 1101',
+  '1010 0011 1110 0101 1001 0110 1100 0001 1011 0100',
+  '0110 1001 0101 1100 0011 1010 1110 0100 1001 0110',
+  '1101 0110 0010 1001 1110 0101 1011 0011 0100 1100',
+  '0011 1010 1001 0110 0100 1111 1100 0010 1010 0111',
+  '1001 0100 1110 0011 1011 0110 0001 1100 0101 1001',
+  '0100 1101 1010 0011 0110 1110 1001 0100 0011 1010',
+  '1110 0101 0011 1011 1001 0110 0100 1100 1010 0001',
+]
+
 export default function Hero({ ready }) {
   const root = useRef(null)
   const canvas = useRef(null)
@@ -51,9 +62,12 @@ export default function Hero({ ready }) {
       },
     })
     lines.forEach((l, i) => tl.to(l, { y: `${speeds[i]}vh`, x: `${drift[i]}vw` }, 0))
+    // Let the typography clear the face as the hero leaves the viewport.
+    // Keeping this in the same scrubbed timeline makes it reverse naturally.
+    tl.to(lines, { opacity: 0, stagger: 0.035, ease: 'power2.in' }, 0.18)
     // fromTo + immediateRender:false so the scrub never fights the intro timeline
     tl.fromTo(meta, { opacity: 1, y: 0 }, { opacity: 0, y: -20, stagger: 0.02, immediateRender: false }, 0)
-    tl.to(el.querySelector('[data-canvas-scale]'), { scale: 1.18 }, 0)
+    tl.to(el.querySelector('[data-canvas-scale]'), { scale: 1.34 }, 0)
 
     return () => {
       splits.filter(Boolean).forEach((s) => s.revert())
@@ -97,9 +111,17 @@ export default function Hero({ ready }) {
       <div ref={canvas} className="absolute inset-0 z-0">
         <div data-canvas-scale className="absolute inset-0">
           <Suspense fallback={null}>
-            <Scene />
+            <Scene ready={ready} />
           </Suspense>
         </div>
+      </div>
+
+      <div className="hero-codefield" aria-hidden="true">
+        {HERO_CODE.map((row, index) => (
+          <span key={row} style={{ '--code-delay': `${index * -0.85}s`, '--code-row': index }}>
+            {row}
+          </span>
+        ))}
       </div>
 
       <div className="pointer-events-none relative z-10 flex h-full flex-col justify-between px-5 pb-6 pt-20 md:px-8 md:pb-8">

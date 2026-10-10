@@ -141,6 +141,11 @@ export default function DroneCompanion() {
     }
   }, [])
 
+  // The companion is intentionally desktop-only. Avoid mounting the R3F
+  // canvas on phones where the GLB is not rendering reliably and where it
+  // competes with the mobile card interactions.
+  if (mobile) return null
+
   return (
     <>
       <div

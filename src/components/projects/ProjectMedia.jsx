@@ -35,7 +35,8 @@ export default function ProjectMedia({ project, index, total }) {
       <img
         src={project.image}
         alt={`${project.title} — ${project.category} project preview`}
-        loading="lazy"
+        loading={index === 0 ? 'eager' : 'lazy'}
+        fetchPriority={index === 0 ? 'high' : 'auto'}
         decoding="async"
         onError={() => setFailed(true)}
         className="h-full w-full object-cover"

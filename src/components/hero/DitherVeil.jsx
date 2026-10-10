@@ -342,7 +342,11 @@ void main() {
     level = texelFetch(tDiffused, ivec2(cell), 0).rgb;
   } else {
     vec3 c = mix(uMatte, textureLod(tImage, sampleUv, uLod).rgb, framed);
-    float t = uPattern == 1 ? blueNoise(cell) : (uPattern == 2 ? engraving(cell) : bayer(cell));
+    // High level mode is used on mobile for a clean face reveal without the
+    // diagonal/ordered dither pattern covering the whole viewport.
+    float t = uLevels >= 32.0
+      ? 0.5
+      : (uPattern == 1 ? blueNoise(cell) : (uPattern == 2 ? engraving(cell) : bayer(cell)));
     level = quantize(toned(c), t);
   }
 
@@ -387,6 +391,7 @@ const DitherVeil = ({
   reverse = false,
   wander = false,
   clickBurst = true,
+  autoBurst = false,
   className = '',
   style
 }) => {
@@ -412,7 +417,8 @@ const DitherVeil = ({
       rim,
       reverse,
       wander,
-      clickBurst
+      clickBurst,
+      autoBurst
     };
     wakeRef.current();
   });
@@ -527,6 +533,7 @@ const DitherVeil = ({
     const coarsePointer = window.matchMedia?.('(pointer: coarse)').matches ?? false;
     let orientationRequested = false;
     let orientationBaseline = null;
+    let autoBurstTimer = null;
 
     const layout = () => {
       width = Math.max(1, container.clientWidth);
@@ -643,8 +650,9 @@ const DitherVeil = ({
       }
       bursts.forEach((b, i) => {
         const k = Math.max(0, (now - b.start) / 1000 / BURST_SECONDS);
-        const reach =
-          Math.hypot(Math.max(b.x, width - b.x), Math.max(b.y, height - b.y)) + viewUniforms.uBurstWidth.value;
+        const reach = b.reach ?? (
+          Math.hypot(Math.max(b.x, width - b.x), Math.max(b.y, height - b.y)) + viewUniforms.uBurstWidth.value
+        );
         burstData[i * 4] = b.x;
         burstData[i * 4 + 1] = b.y;
         burstData[i * 4 + 2] = reach * Math.sin((k * Math.PI) / 2);
@@ -752,6 +760,7 @@ const DitherVeil = ({
       pointer.placed = true;
     };
     const onMove = e => {
+      if (coarsePointer && e.pointerType && e.pointerType !== 'mouse') return;
       locate(e);
       if (!reducedMotion) {
         const rect = container.getBoundingClientRect();
@@ -777,6 +786,7 @@ const DitherVeil = ({
       wake();
     };
     const onDown = e => {
+      if (coarsePointer && e.pointerType !== 'mouse') return;
       onMove(e);
       if (!settingsRef.current?.clickBurst || (e.pointerType === 'mouse' && e.button !== 0)) return;
       bursts.push({ x: pointer.x, y: pointer.y, start: performance.now() });
@@ -809,10 +819,39 @@ const DitherVeil = ({
       }
     };
 
+    // Android and other browsers do not need a permission prompt, so start
+    // gravity tracking immediately. iOS is enabled from the first gesture
+    // below because Safari requires requestPermission() inside that gesture.
+    if (coarsePointer && typeof window.DeviceOrientationEvent?.requestPermission !== 'function') {
+      enableOrientation();
+    }
+
+    if (coarsePointer && autoBurst && !reducedMotion) {
+      const triggerAutoBurst = () => {
+        const now = performance.now();
+        const count = 2 + Math.floor(Math.random() * 2);
+        for (let i = 0; i < count; i++) {
+          bursts.push({
+            // Keep the reveal inside the face area, but vary both axes so
+            // every cycle begins from a different angle and location.
+            x: width * (0.22 + Math.random() * 0.56),
+            y: height * (0.2 + Math.random() * 0.6),
+            reach: Math.min(width, height) * (0.22 + Math.random() * 0.16),
+            start: now + i * 90,
+          });
+        }
+        while (bursts.length > MAX_BURSTS) bursts.shift();
+        wake();
+      };
+      autoBurstTimer = window.setInterval(triggerAutoBurst, 2800);
+      window.setTimeout(triggerAutoBurst, 800);
+    }
+
     container.addEventListener('pointermove', onMove, { passive: true });
     container.addEventListener('pointerenter', onMove, { passive: true });
     container.addEventListener('pointerdown', onDown, { passive: true });
     container.addEventListener('pointerdown', enableOrientation, { passive: true });
+    if (coarsePointer) window.addEventListener('pointerdown', enableOrientation, { passive: true, once: true });
     container.addEventListener('pointerleave', onLeave, { passive: true });
     container.addEventListener('pointercancel', onLeave, { passive: true });
 
@@ -840,9 +879,11 @@ const DitherVeil = ({
       container.removeEventListener('pointerenter', onMove);
       container.removeEventListener('pointerdown', onDown);
       container.removeEventListener('pointerdown', enableOrientation);
+      if (coarsePointer) window.removeEventListener('pointerdown', enableOrientation);
       container.removeEventListener('pointerleave', onLeave);
       container.removeEventListener('pointercancel', onLeave);
       window.removeEventListener('deviceorientation', onOrientation);
+      if (autoBurstTimer) window.clearInterval(autoBurstTimer);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
       if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
     };
