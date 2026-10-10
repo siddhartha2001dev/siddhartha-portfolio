@@ -1122,7 +1122,7 @@ html:not([data-theme-mode='night']) #ai-lab .ai-lab-card__noise {
     height: auto;
     width: 100vw;
     margin-left: calc(50% - 50vw);
-    padding-inline: 1.25rem;
+    padding-inline: calc((100vw - min(84vw, 30rem)) / 2);
     padding-bottom: 0.9rem;
     overflow-x: auto !important;
     overflow-y: visible !important;
@@ -1132,6 +1132,7 @@ html:not([data-theme-mode='night']) #ai-lab .ai-lab-card__noise {
     scroll-snap-type: x mandatory;
     scrollbar-color: var(--color-accent) rgba(255, 255, 255, 0.12);
     scrollbar-width: thin;
+    scroll-padding-inline: calc((100vw - min(84vw, 30rem)) / 2);
   }
 
   .ai-lab-card {
@@ -1143,8 +1144,9 @@ html:not([data-theme-mode='night']) #ai-lab .ai-lab-card__noise {
     min-height: 0;
     overflow: hidden;
     touch-action: pan-x;
-    transform: none !important;
-    scroll-snap-align: start;
+    scroll-snap-align: center;
+    will-change: transform, opacity;
+    transition: border-color 0.55s var(--ease-expo), background 0.55s ease, opacity 0.2s ease;
   }
 }
 

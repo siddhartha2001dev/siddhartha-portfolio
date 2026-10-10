@@ -157,7 +157,39 @@ export default function AiLab() {
     const mobile = window.matchMedia('(max-width: 767px)').matches
     // Mobile uses a simple in-flow card list. The desktop stack is kept
     // intact, but pinned transforms make touch scrolling unnecessarily hard.
-    if (mobile) return undefined
+    if (mobile) {
+      let frame = 0
+      const updateMobileCards = () => {
+        frame = 0
+        const bounds = track.getBoundingClientRect()
+        const center = bounds.left + bounds.width / 2
+        const spread = Math.max(1, bounds.width * 0.82)
+        cards.forEach((card, index) => {
+          const cardCenter = bounds.left + card.offsetLeft - track.scrollLeft + card.offsetWidth / 2
+          const offset = (cardCenter - center) / spread
+          const distance = Math.min(1, Math.abs(offset))
+          gsap.set(card, {
+            scale: 1 - distance * 0.075,
+            rotateY: offset * -7,
+            rotateZ: offset * 1.2,
+            opacity: 1 - distance * 0.28,
+            zIndex: 100 - Math.round(distance * 10) - index,
+          })
+        })
+      }
+      const onScroll = () => {
+        if (!frame) frame = requestAnimationFrame(updateMobileCards)
+      }
+      updateMobileCards()
+      track.addEventListener('scroll', onScroll, { passive: true })
+      window.addEventListener('resize', updateMobileCards)
+      return () => {
+        track.removeEventListener('scroll', onScroll)
+        window.removeEventListener('resize', updateMobileCards)
+        if (frame) cancelAnimationFrame(frame)
+        gsap.killTweensOf(cards)
+      }
+    }
     const getTravel = () => Math.max(1, track.clientHeight + 32)
     const updateCards = (progress = scrollProgress.current) => {
       scrollProgress.current = progress
