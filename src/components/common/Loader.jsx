@@ -2,7 +2,8 @@ import { useEffect, useRef } from 'react'
 import { gsap } from '../../animations/gsapSetup'
 import siteConfig from '../../data/siteConfig'
 
-// Short, honest loader: waits for fonts, floors at ~1.3s, then wipes up into the hero.
+// Loader holds long enough for the type and cyber-art layers to register before
+// the screen wipes into the hero.
 export default function Loader({ onReveal, onComplete }) {
   const root = useRef(null)
   const num = useRef(null)
@@ -16,7 +17,7 @@ export default function Loader({ onReveal, onComplete }) {
       const tl = gsap.timeline({ paused: true })
       tl.to(counter, {
         v: 100,
-        duration: 1.3,
+        duration: 1.8,
         ease: 'power2.inOut',
         onUpdate: () => {
           const n = Math.round(counter.v)
@@ -29,7 +30,7 @@ export default function Loader({ onReveal, onComplete }) {
       tl.call(() => onReveal?.(), null, '-=0.6')
       tl.call(() => onComplete?.())
       const fontsReady = document.fonts?.ready ?? Promise.resolve()
-      Promise.race([fontsReady, new Promise((r) => setTimeout(r, 1500))]).then(() => tl.play())
+      Promise.race([fontsReady, new Promise((r) => setTimeout(r, 1900))]).then(() => tl.play())
     }, root)
     return () => ctx.revert()
   }, [onReveal, onComplete])
@@ -39,14 +40,26 @@ export default function Loader({ onReveal, onComplete }) {
       ref={root}
       role="status"
       aria-label="Loading"
-      className="fixed inset-0 z-[900] flex flex-col justify-between bg-ink p-5 text-paper md:p-8"
+      className="loader-screen fixed inset-0 z-[900] flex flex-col justify-between overflow-hidden bg-ink p-5 text-paper md:p-8"
       style={{ clipPath: 'inset(0 0 0% 0)' }}
     >
-      <div className="flex justify-between font-mono text-[11px] uppercase tracking-[0.2em] text-muted">
+      <div className="loader-screen__art" aria-hidden="true">
+        <span className="loader-screen__flash loader-screen__flash--one">SIGNAL / 001</span>
+        <span className="loader-screen__flash loader-screen__flash--two">CYBER<br />FORM</span>
+        <span className="loader-screen__flash loader-screen__flash--three">///</span>
+        <span className="loader-screen__flash loader-screen__flash--four">NO<br />SIGNAL</span>
+        <span className="loader-screen__flash loader-screen__flash--five">0101 1100<br />0010 0111</span>
+        <span className="loader-screen__graffiti loader-screen__graffiti--one">404</span>
+        <span className="loader-screen__graffiti loader-screen__graffiti--two">CTRL<br />SHIFT</span>
+        <span className="loader-screen__graffiti loader-screen__graffiti--three">↯</span>
+        <span className="loader-screen__grid" />
+        <span className="loader-screen__scanline" />
+      </div>
+      <div className="relative z-10 flex justify-between font-mono text-[11px] uppercase tracking-[0.2em] text-muted">
         <span>{siteConfig.role}</span>
         <span>{siteConfig.coordinates}</span>
       </div>
-      <div className="mask-line">
+      <div className="mask-line relative z-10">
         <h1
           ref={name}
           className="font-display text-[clamp(3.5rem,17vw,16rem)] font-black uppercase leading-[0.85] tracking-[-0.04em] wdth-cond"
@@ -54,7 +67,7 @@ export default function Loader({ onReveal, onComplete }) {
           {siteConfig.fullName}
         </h1>
       </div>
-      <div>
+      <div className="relative z-10">
         <div className="mb-3 flex items-end justify-between font-mono text-[11px] uppercase tracking-[0.2em]">
           <span className="text-muted">Loading portfolio</span>
           <span ref={num} className="text-accent">000</span>

@@ -16,8 +16,10 @@ import About from './sections/About'
 import SelectedWork from './sections/SelectedWork'
 import Experience from './sections/Experience'
 import Skills from './sections/Skills'
+import AiLab from './sections/AiLab'
 import Contact from './sections/Contact'
 import Game from './sections/Game'
+import DroneCompanion from './components/common/DroneCompanion'
 
 function HomePage({ ready }) {
   return (
@@ -28,6 +30,7 @@ function HomePage({ ready }) {
       <SelectedWork />
       <Experience />
       <Skills />
+      <AiLab />
       <Contact />
     </>
   )
@@ -80,6 +83,7 @@ function AppShell() {
       <Grain />
       <GridLines />
       <Navigation visible={ready} />
+      <DroneCompanion />
       <main>
         <Routes>
           <Route path="/" element={<HomePage ready={ready} />} />

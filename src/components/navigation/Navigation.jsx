@@ -14,11 +14,20 @@ const LINKS = [
 export default function Navigation({ visible }) {
   const [open, setOpen] = useState(false)
   const [onLight, setOnLight] = useState(false)
+  const [ripples, setRipples] = useState([])
   const [nightMode, setNightMode] = useState(() => window.localStorage?.getItem('portfolio-theme') === 'night')
   const { pathname } = useLocation()
   const currentPath = pathname.replace(/\/+$/, '') || '/'
   const header = useRef(null)
   const overlay = useRef(null)
+
+  const addGlassRipple = (event) => {
+    const bounds = header.current?.getBoundingClientRect()
+    if (!bounds) return
+    const ripple = { id: `${Date.now()}-${Math.random()}`, x: event.clientX - bounds.left, y: event.clientY - bounds.top }
+    setRipples((current) => [...current.slice(-2), ripple])
+    window.setTimeout(() => setRipples((current) => current.filter((item) => item.id !== ripple.id)), 850)
+  }
 
   useEffect(() => {
     if (nightMode) {
@@ -39,8 +48,13 @@ export default function Navigation({ visible }) {
   useEffect(() => {
     let raf = 0
     const sections = [...document.querySelectorAll('[data-theme]')]
+    const routeIsLight = ['/projects', '/about', '/experience', '/contact'].includes(currentPath)
     const update = () => {
       raf = 0
+      if (routeIsLight) {
+        setOnLight(true)
+        return
+      }
       // header colour follows whichever section sits under it (later sections stack on top)
       let theme = 'ink'
       for (const sec of sections) {
@@ -58,7 +72,7 @@ export default function Navigation({ visible }) {
       window.removeEventListener('resize', onScroll)
       window.removeEventListener('scroll', onScroll)
     }
-  }, [])
+  }, [currentPath])
 
   // mobile menu: animate + lock scroll + Esc
   useEffect(() => {
@@ -87,7 +101,16 @@ export default function Navigation({ visible }) {
           open || onLight ? 'site-nav--light text-ink' : 'text-paper'
         }`}
       >
-        <nav aria-label="Primary" className="bg-transparent flex items-center justify-between px-5 py-5 md:px-8">
+        <nav aria-label="Primary" onPointerDown={addGlassRipple} className="relative flex items-center justify-between overflow-hidden bg-transparent px-5 py-5 md:px-8">
+          <span className="site-nav__liquid-shine" aria-hidden="true" />
+          {ripples.map((ripple) => (
+            <span
+              key={ripple.id}
+              aria-hidden="true"
+              className="site-nav__glass-ripple"
+              style={{ left: ripple.x, top: ripple.y }}
+            />
+          ))}
           <Link
             to="/"
             data-cursor="link"
@@ -124,8 +147,8 @@ export default function Navigation({ visible }) {
             aria-pressed={nightMode}
             onClick={() => setNightMode((mode) => !mode)}
           >
-            <span aria-hidden="true" className={`relative block h-6 w-11 rounded-full border border-current/50 p-0.5 transition-colors duration-500 ${nightMode ? 'bg-accent/20' : 'bg-current/10'}`}>
-              <span className={`block h-4 w-4 rounded-full bg-accent shadow-[0_0_12px_rgba(255,74,28,0.45)] transition-transform duration-500 ease-expo ${nightMode ? 'translate-x-5' : 'translate-x-0'}`} />
+            <span aria-hidden="true" className={`theme-toggle__track relative block h-6 w-11 rounded-full p-0.5 transition-colors duration-500 ${nightMode ? 'bg-accent/20' : 'bg-current/10'}`}>
+              <span className={`theme-toggle__thumb block h-5 w-5 rounded-full bg-accent transition-transform duration-500 ease-expo ${nightMode ? 'translate-x-5' : 'translate-x-0'}`} />
             </span>
             {nightMode ? 'Day' : 'Night'}
           </button>
@@ -134,13 +157,13 @@ export default function Navigation({ visible }) {
             <button
               type="button"
               data-cursor="link"
-              className="grid h-10 w-14 place-items-center rounded-full border border-current/40 transition-colors duration-300 hover:border-accent"
+              className="theme-toggle__button grid h-10 w-14 place-items-center rounded-full transition-colors duration-300"
               aria-label={nightMode ? 'Switch to day mode' : 'Switch to night mode'}
               aria-pressed={nightMode}
               onClick={() => setNightMode((mode) => !mode)}
             >
-              <span aria-hidden="true" className={`relative block h-6 w-11 rounded-full p-0.5 transition-colors duration-500 ${nightMode ? 'bg-accent/20' : 'bg-current/10'}`}>
-                <span className={`relative block h-5 w-5 rounded-full bg-accent shadow-[0_0_12px_rgba(255,74,28,0.45)] transition-transform duration-500 ease-expo ${nightMode ? 'translate-x-5' : 'translate-x-0'}`}>
+              <span aria-hidden="true" className={`theme-toggle__track relative block h-6 w-11 rounded-full p-0.5 transition-colors duration-500 ${nightMode ? 'bg-accent/20' : 'bg-current/10'}`}>
+                <span className={`theme-toggle__thumb relative block h-5 w-5 rounded-full bg-accent transition-transform duration-500 ease-expo ${nightMode ? 'translate-x-5' : 'translate-x-0'}`}>
                   <span className="absolute inset-0 grid place-items-center text-[11px] text-ink">{nightMode ? '☼' : '◐'}</span>
                 </span>
               </span>

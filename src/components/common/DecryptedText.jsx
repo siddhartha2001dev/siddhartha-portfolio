@@ -114,7 +114,7 @@ export default function DecryptedText({
   }, [animateOn, run])
 
   const events = animateOn === 'hover' || animateOn === 'inViewHover'
-    ? { onMouseEnter: () => !animating && run(), onMouseLeave: reset }
+    ? { onMouseEnter: () => !animating && run(), onMouseLeave: reset, onFocus: () => !animating && run(), onBlur: reset }
     : animateOn === 'click'
       ? { onClick: () => (clickMode === 'toggle' && decrypted ? run() : !decrypted ? run() : undefined) }
       : {}

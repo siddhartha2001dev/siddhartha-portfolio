@@ -524,6 +524,9 @@ const DitherVeil = ({
     const pointer = { x: 0, y: 0, inside: false, fresh: true, placed: false };
     const brush = { x: 0, y: 0, px: 0, py: 0 };
     const bursts = [];
+    const coarsePointer = window.matchMedia?.('(pointer: coarse)').matches ?? false;
+    let orientationRequested = false;
+    let orientationBaseline = null;
 
     const layout = () => {
       width = Math.max(1, container.clientWidth);
@@ -779,9 +782,37 @@ const DitherVeil = ({
       bursts.push({ x: pointer.x, y: pointer.y, start: performance.now() });
       if (bursts.length > MAX_BURSTS) bursts.shift();
     };
+
+    const onOrientation = event => {
+      if (reducedMotion || !coarsePointer || typeof event.gamma !== 'number' || typeof event.beta !== 'number') return;
+      if (!orientationBaseline) orientationBaseline = { beta: event.beta, gamma: event.gamma };
+      const x = Math.max(-1, Math.min(1, (event.gamma - orientationBaseline.gamma) / 28));
+      const y = Math.max(-1, Math.min(1, (event.beta - orientationBaseline.beta) / 28));
+      pointer.inside = true;
+      container.style.setProperty('--parallax-x', `${x * 0.9}%`);
+      container.style.setProperty('--parallax-y', `${y * 0.55}%`);
+      container.style.setProperty('--parallax-rotate-y', `${x * 3.2}deg`);
+      container.style.setProperty('--parallax-rotate-x', `${-y * 2.2}deg`);
+      wake();
+    };
+
+    const enableOrientation = () => {
+      if (!coarsePointer || orientationRequested) return;
+      orientationRequested = true;
+      const OrientationEvent = window.DeviceOrientationEvent;
+      if (typeof OrientationEvent?.requestPermission === 'function') {
+        OrientationEvent.requestPermission().then(permission => {
+          if (permission === 'granted') window.addEventListener('deviceorientation', onOrientation, { passive: true });
+        }).catch(() => {});
+      } else if (OrientationEvent) {
+        window.addEventListener('deviceorientation', onOrientation, { passive: true });
+      }
+    };
+
     container.addEventListener('pointermove', onMove, { passive: true });
     container.addEventListener('pointerenter', onMove, { passive: true });
     container.addEventListener('pointerdown', onDown, { passive: true });
+    container.addEventListener('pointerdown', enableOrientation, { passive: true });
     container.addEventListener('pointerleave', onLeave, { passive: true });
     container.addEventListener('pointercancel', onLeave, { passive: true });
 
@@ -808,8 +839,10 @@ const DitherVeil = ({
       container.removeEventListener('pointermove', onMove);
       container.removeEventListener('pointerenter', onMove);
       container.removeEventListener('pointerdown', onDown);
+      container.removeEventListener('pointerdown', enableOrientation);
       container.removeEventListener('pointerleave', onLeave);
       container.removeEventListener('pointercancel', onLeave);
+      window.removeEventListener('deviceorientation', onOrientation);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
       if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
     };

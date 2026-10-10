@@ -20,6 +20,7 @@ export default function ProjectFrame({ project, index, total }) {
     const slide = el.querySelector('[data-slide]')
     const title = el.querySelector('[data-title]')
     const meta = el.querySelectorAll('[data-meta] > *')
+    const tech = el.querySelectorAll('[data-tech] > li')
 
     // Frame opens (clip-path) as it enters; next project arrives from the opposite side.
     gsap.fromTo(frame, { clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0% 0 0 0)', duration: 1.7, ease: 'expo.inOut', scrollTrigger: { trigger: el, start: 'top 70%' } })
@@ -40,7 +41,8 @@ export default function ProjectFrame({ project, index, total }) {
       gsap.fromTo(title, { x: flip ? '-5vw' : '5vw' }, { x: flip ? '3vw' : '-3vw', ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } })
     }
 
-    gsap.from(meta, { opacity: 0, y: 24, stagger: 0.09, duration: 1, scrollTrigger: { trigger: el, start: 'top 60%' } })
+    gsap.from(meta, { opacity: 0, y: 24, stagger: 0.09, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 60%' } })
+    gsap.from(tech, { opacity: 0, y: 12, stagger: 0.05, duration: 0.65, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 55%' } })
     return () => cleanups.forEach((c) => c())
   })
 
@@ -86,11 +88,15 @@ export default function ProjectFrame({ project, index, total }) {
             aria-label={`Open project: ${project.title}`}
             className="block"
           >
-            <div data-frame className="relative aspect-[4/5] w-full overflow-hidden bg-white/5 sm:aspect-[4/3]">
+            <div data-frame className="project-frame relative aspect-[4/5] w-full overflow-hidden bg-white/5 sm:aspect-[4/3]">
               <div data-hover-scale className="h-full w-full">
                 <div data-media className="h-full w-full will-change-transform">
                   <ProjectMedia project={project} index={index} total={total} />
                 </div>
+              </div>
+              <div className="project-frame__veil absolute inset-0 flex items-end justify-between p-5 font-mono text-[10px] uppercase tracking-[0.18em] text-white sm:p-7">
+                <span>View case study</span>
+                <span className="grid h-9 w-9 place-items-center rounded-full border border-white/60 text-base transition-transform duration-500">↗</span>
               </div>
             </div>
           </a>
@@ -102,18 +108,18 @@ export default function ProjectFrame({ project, index, total }) {
             flip ? 'md:col-start-1' : 'md:col-start-10'
           }`}
         >
-          <p className="flex items-baseline gap-3">
+          <p className="project-meta__index flex items-baseline gap-3">
             <span className="text-accent">{num}</span>
             <span className="text-muted">/ {String(total).padStart(2, '0')}</span>
             <span className="ml-auto text-paper">{project.year}</span>
           </p>
-          <p className="text-muted">{project.category}</p>
-          <p className="max-w-[34ch] font-display text-[15px] font-normal normal-case leading-relaxed tracking-normal text-paper/85">
+          <p className="project-meta__category text-muted">{project.category}</p>
+          <p className="project-meta__description max-w-[34ch] font-display text-[15px] font-normal normal-case leading-relaxed tracking-normal text-paper/85">
             {project.description}
           </p>
-          <ul data-tech className="flex flex-wrap gap-x-4 gap-y-1 text-paper/70 md:flex-col md:gap-y-0.5">
+          <ul data-tech className="flex flex-wrap gap-2 text-paper/70">
             {project.technologies.map((t) => (
-              <li key={t}>{t}</li>
+              <li key={t} className="project-tech-pill rounded-full border border-current/25 px-2.5 py-1 text-[9px] tracking-[0.12em] transition-colors duration-300">{t}</li>
             ))}
           </ul>
         </div>
