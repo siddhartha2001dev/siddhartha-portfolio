@@ -6,6 +6,7 @@ import { setLenis } from '../animations/lenisStore'
 // One scroll system: Lenis drives ScrollTrigger through GSAP's ticker.
 export function useLenis(reduced) {
   useEffect(() => {
+    const touch = window.matchMedia?.('(pointer: coarse)').matches ?? false
     const lenis = new Lenis({
       // Drive Lenis from GSAP's ticker so scroll and ScrollTrigger stay on
       // the same frame. Lerp gives a more consistent feel than a fixed
@@ -13,10 +14,13 @@ export function useLenis(reduced) {
       autoRaf: false,
       // A lower lerp produces a longer, softer glide instead of a sharp
       // catch-up when the wheel emits larger deltas.
-      lerp: reduced ? 1 : 0.055,
-      smoothWheel: !reduced,
-      wheelMultiplier: reduced ? 1 : 0.78,
-      touchMultiplier: reduced ? 1 : 1.05,
+      // Keep touch scrolling native/direct so pinned mobile ScrollTriggers
+      // receive every reversal instead of following a second smooth-scroll
+      // interpolation layer.
+      lerp: reduced || touch ? 1 : 0.055,
+      smoothWheel: !reduced && !touch,
+      wheelMultiplier: reduced || touch ? 1 : 0.78,
+      touchMultiplier: 1,
       syncTouch: false,
       overscroll: true,
     })
