@@ -279,11 +279,11 @@ export default function AiLab() {
 
               <div className="ai-lab-card__screen relative z-10 my-5 grid place-items-center md:my-6" aria-hidden="true">
                 {experiment.visual === 'discovery' && <div className="ai-lab-visual ai-lab-visual--discovery"><span className="ai-lab-visual__target">?</span><span className="ai-lab-visual__orbit" /><span className="ai-lab-visual__label">QUESTION / SIGNAL</span></div>}
-                {experiment.visual === 'design' && <div className="ai-lab-visual ai-lab-visual--design"><span className="ai-lab-visual__window"><i /><i /><i /></span><span className="ai-lab-visual__cursor">↖</span><span className="ai-lab-visual__label">FRAME / FLOW</span></div>}
+                {experiment.visual === 'design' && <div className="ai-lab-visual ai-lab-visual--design"><span className="ai-lab-visual__window"><i /><i /><i /></span><span className="ai-lab-visual__cursor">↖︎</span><span className="ai-lab-visual__label">FRAME / FLOW</span></div>}
                 {experiment.visual === 'frontend' && <div className="ai-lab-visual ai-lab-visual--frontend"><span className="ai-lab-visual__bracket">&lt;/&gt;</span><span className="ai-lab-visual__cursor">+</span><span className="ai-lab-visual__label">COMPONENT / MOTION</span></div>}
                 {experiment.visual === 'backend' && <div className="ai-lab-visual ai-lab-visual--backend"><span className="ai-lab-visual__database"><i /><i /><i /></span><span className="ai-lab-visual__label">DATA / ROUTES</span></div>}
-                {experiment.visual === 'integrate' && <div className="ai-lab-visual ai-lab-visual--integrate"><span className="ai-lab-visual__plug">↯</span><span className="ai-lab-visual__connector ai-lab-visual__connector--one" /><span className="ai-lab-visual__connector ai-lab-visual__connector--two" /><span className="ai-lab-visual__label">SERVICE / VALUE</span></div>}
-                {experiment.visual === 'ship' && <div className="ai-lab-visual ai-lab-visual--ship"><span className="ai-lab-visual__check">✓</span><span className="ai-lab-visual__launch">↗</span><span className="ai-lab-visual__label">RELEASE / NEXT</span></div>}
+                {experiment.visual === 'integrate' && <div className="ai-lab-visual ai-lab-visual--integrate"><span className="ai-lab-visual__plug">↯︎</span><span className="ai-lab-visual__connector ai-lab-visual__connector--one" /><span className="ai-lab-visual__connector ai-lab-visual__connector--two" /><span className="ai-lab-visual__label">SERVICE / VALUE</span></div>}
+                {experiment.visual === 'ship' && <div className="ai-lab-visual ai-lab-visual--ship"><span className="ai-lab-visual__check">✓</span><span className="ai-lab-visual__launch">↗︎</span><span className="ai-lab-visual__label">RELEASE / NEXT</span></div>}
               </div>
 
               <div className="relative z-10">

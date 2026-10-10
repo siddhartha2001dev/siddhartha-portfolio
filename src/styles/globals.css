@@ -1131,7 +1131,7 @@ html:not([data-theme-mode='night']) #ai-lab .ai-lab-card__noise {
     padding-bottom: 0.9rem;
     overflow-x: auto !important;
     overflow-y: visible !important;
-    touch-action: pan-x;
+    touch-action: pan-x pan-y;
     perspective: none;
     overscroll-behavior-inline: contain;
     scroll-snap-type: x mandatory;
@@ -1148,7 +1148,7 @@ html:not([data-theme-mode='night']) #ai-lab .ai-lab-card__noise {
     height: 32rem;
     min-height: 0;
     overflow: hidden;
-    touch-action: pan-x;
+    touch-action: pan-x pan-y;
     scroll-snap-align: center;
     will-change: transform, opacity;
     transition: border-color 0.55s var(--ease-expo), background 0.55s ease, opacity 0.2s ease;
@@ -1273,6 +1273,8 @@ html:not([data-theme-mode='night']) #ai-lab .ai-lab-card__noise {
   color: var(--color-accent);
   font-size: 3.2rem;
   text-shadow: 0 0 18px rgba(255, 74, 28, 0.8);
+  font-family: var(--font-mono), sans-serif;
+  font-variant-emoji: text;
 }
 
 .ai-lab-visual__connector {
@@ -1314,6 +1316,8 @@ html:not([data-theme-mode='night']) #ai-lab .ai-lab-card__noise {
   bottom: 0.5rem;
   color: var(--color-paper);
   font-size: 2.3rem;
+  font-family: var(--font-mono), sans-serif;
+  font-variant-emoji: text;
 }
 
 .ai-lab-card:hover .ai-lab-visual__check { transform: scale(1.1) rotate(12deg); background: rgba(255, 74, 28, 0.14); }
@@ -1396,6 +1400,8 @@ html:not([data-theme-mode='night']) #ai-lab .ai-lab-card__noise {
   color: var(--color-paper);
   font-size: 2.2rem;
   transition: transform 0.7s var(--ease-expo);
+  font-family: var(--font-mono), sans-serif;
+  font-variant-emoji: text;
 }
 
 .ai-lab-card--interface:hover .ai-lab-visual__window { transform: translate(-0.4rem, -0.4rem) rotate(-3deg); }
