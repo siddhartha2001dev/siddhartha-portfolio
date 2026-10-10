@@ -154,6 +154,7 @@ export default function AiLab() {
     const track = rail.current
     if (!track) return undefined
     const cards = [...track.querySelectorAll('[data-lab-card]')]
+    const mobile = window.matchMedia('(max-width: 767px)').matches
     const getTravel = () => Math.max(1, track.clientHeight + 32)
     const updateCards = (progress = scrollProgress.current) => {
       scrollProgress.current = progress
@@ -186,9 +187,9 @@ export default function AiLab() {
       // timing and card-to-card rhythm as the desktop animation.
       end: () => `+=${Math.max(1200, cards.length * 360)}`,
       pin: true,
-      // Use the same scrub behavior on touch and desktop so the stack follows
-      // the same movement curve in both directions.
-      scrub: 1,
+      // A boolean scrub removes the one-second tween that can leave a card
+      // frozen on its forward position after a quick mobile direction change.
+      scrub: mobile ? true : 1,
       invalidateOnRefresh: true,
       onRefresh: (self) => updateCards(self.progress),
       onUpdate: (self) => {
