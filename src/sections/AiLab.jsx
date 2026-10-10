@@ -154,16 +154,15 @@ export default function AiLab() {
     const track = rail.current
     if (!track) return undefined
     const cards = [...track.querySelectorAll('[data-lab-card]')]
+    const mobile = window.matchMedia('(max-width: 767px)').matches
     const updateCards = (progress = scrollProgress.current) => {
       scrollProgress.current = progress
       // Move each card by one complete rail height per stack step. A fixed
       // pixel distance left taller cards partially visible near the end.
       const travel = Math.max(1, track.clientHeight + 32)
-      cards.forEach((card) => {
-        const index = cards.indexOf(card)
+      cards.forEach((card, index) => {
         const distance = index - progress * (cards.length - 1)
         const depth = Math.max(0, distance)
-        const passed = Math.min(1, Math.max(0, -distance))
         gsap.set(card, {
           y: distance < 0 ? distance * travel : Math.min(1.8, depth) * 22,
           rotateZ: distance < 0 ? distance * (index % 2 ? -2.2 : 2.2) : Math.min(1.8, depth) * (index % 2 ? 1.2 : -1.2),
@@ -185,8 +184,11 @@ export default function AiLab() {
       start: () => `center ${Math.round(window.innerHeight / 2 + 32)}px`,
       end: () => `+=${Math.max(1200, cards.length * 360)}`,
       pin: true,
-      scrub: 1,
+      // Touch scrolling needs a direct reversible mapping; the desktop scrub
+      // lag makes the stack appear to skip or stall when scrolling upward.
+      scrub: mobile ? true : 1,
       invalidateOnRefresh: true,
+      onRefresh: (self) => updateCards(self.progress),
       onUpdate: (self) => {
         updateCards(self.progress)
       },
