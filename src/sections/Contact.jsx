@@ -107,6 +107,18 @@ export default function Contact({ standalone = false }) {
           </div>
         </div>}
       </div>
+      {!standalone && (
+        <div className="relative z-10 mx-auto flex max-w-[1480px] justify-end border-t border-ink/15 px-5 pb-[7vh] pt-5 md:px-10">
+          <MagneticLink
+            href="#top"
+            onClick={(event) => { event.preventDefault(); scrollToTarget(0) }}
+            aria-label="Back to top"
+            className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-ink/65 transition-colors duration-500 hover:text-accent"
+          >
+            Back to top <span aria-hidden="true">↑</span>
+          </MagneticLink>
+        </div>
+      )}
       {!standalone && <Footer />}
     </section>
   )
