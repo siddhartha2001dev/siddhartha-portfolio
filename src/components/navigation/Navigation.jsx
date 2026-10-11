@@ -119,7 +119,7 @@ export default function Navigation({ visible }) {
             {siteConfig.name}<span className="text-accent">.</span>
           </Link>
 
-          <ul className="hidden items-center gap-9 md:flex">
+          <ul className="hidden items-center gap-9 xl:flex">
             {LINKS.map((l) => (
               <li key={l.href}>
                 <Link
@@ -142,7 +142,7 @@ export default function Navigation({ visible }) {
           <button
             type="button"
             data-cursor="link"
-            className="hidden items-center gap-3 font-mono text-[11px] uppercase tracking-[0.2em] md:flex"
+            className="hidden items-center gap-3 font-mono text-[11px] uppercase tracking-[0.2em] xl:flex"
             aria-label={nightMode ? 'Switch to day mode' : 'Switch to night mode'}
             aria-pressed={nightMode}
             onClick={() => setNightMode((mode) => !mode)}
@@ -153,7 +153,7 @@ export default function Navigation({ visible }) {
             {nightMode ? 'Day' : 'Night'}
           </button>
 
-          <div className="flex items-center gap-4 md:hidden">
+          <div className="flex items-center gap-4 xl:hidden">
             <button
               type="button"
               data-cursor="link"
@@ -184,7 +184,7 @@ export default function Navigation({ visible }) {
       <div
         id="mobile-menu"
         ref={overlay}
-        className="pointer-events-none fixed inset-0 z-[650] flex flex-col justify-end bg-accent p-5 text-ink md:hidden"
+        className="pointer-events-none fixed inset-0 z-[650] flex flex-col justify-end bg-accent p-5 text-ink xl:hidden"
         style={{ clipPath: 'inset(0 0 100% 0)' }}
         aria-hidden={!open}
       >

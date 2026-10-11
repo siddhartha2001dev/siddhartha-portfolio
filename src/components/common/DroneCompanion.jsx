@@ -172,7 +172,7 @@ export default function DroneCompanion() {
           <pointLight position={[-2, 0.4, 1]} intensity={1.8} color="#5ab9ff" distance={7} decay={2} />
           <Environment preset="city" environmentIntensity={0.72} />
           <BeeRig progressRef={progressRef} reduced={reduced} reacting={reacting} />
-          <ContactShadows position={[0, -2.2, 0]} opacity={mobile ? 0.22 : 0.3} scale={5} blur={mobile ? 2.2 : 2.8} far={3.2} color="#14181c" />
+          <ContactShadows position={[0, -2.05, -1.15]} opacity={mobile ? 0.22 : 0.3} scale={5} blur={mobile ? 2.2 : 2.8} far={3.2} color="#14181c" />
         </Canvas>
       </div>
       </div>
